@@ -1,10 +1,8 @@
 import instaloader
 import tkinter as tk
-
-def EnterInput():
-    inp = username.get(1.0, "end-1c") # Get input from text box
-    #lbl.config(text="username: "+inp)
-    print(inp)
+import shutil
+import os
+from PIL import Image, ImageTk
 
 def InitializeGUI():
     # Set basic things on window
@@ -13,7 +11,7 @@ def InitializeGUI():
     gui.config(bg='#292929')
 
     width = 400  # Width
-    height = 200  # Height
+    height = 400  # Height
 
     screen_width = gui.winfo_screenwidth()  # Width of the screen
     screen_height = gui.winfo_screenheight()  # Height of the screen
@@ -24,6 +22,28 @@ def InitializeGUI():
 
     gui.geometry('%dx%d+%d+%d' % (width, height, x - 100, y - 100))
 
+def EnterInput():
+    user = username.get(1.0, "end-1c") # Get input from text box
+    DownloadProfilePic(user)
+
+def DownloadProfilePic(username):
+    ig = instaloader.Instaloader()
+    ig.download_profile(username, profile_pic_only=True)
+    LoadImage(username)
+
+def LoadImage(username):
+    for file in os.listdir(username):
+        if file.endswith(".jpg"):
+            image_ = Image.open(username + "\\" + file)
+            n_image = image_.resize((200, 200))
+            photo = ImageTk.PhotoImage(n_image)
+            img_label = tk.Label(gui, image=photo)
+            img_label.photo = photo  # <--
+            img_label.place(x=100, y=100)
+    RemoveImage(username)
+
+def RemoveImage(username):
+    shutil.rmtree(username)
 
 if __name__ == '__main__':
     gui = tk.Tk()
